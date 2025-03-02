@@ -1,0 +1,35 @@
+{% extends 'files/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title text-center">Мои суммаризации</h3>
+            </div>
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Файл</th>
+                            <th>Тип</th>
+                            <th>Дата загрузки</th>
+                            <th>Суммаризация</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for file in files %}
+                        <tr>
+                            <td>{{ file.file.name }}</td>
+                            <td>{{ file.get_file_type_display }}</td>
+                            <td>{{ file.uploaded_at }}</td>
+                            <td>{{ file.summary|default:"Обработка..." }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

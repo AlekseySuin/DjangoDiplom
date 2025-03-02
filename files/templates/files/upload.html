@@ -1,0 +1,44 @@
+{% extends 'files/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title text-center">Загрузите файл для суммаризации</h3>
+            </div>
+            <div class="card-body">
+                <form id="upload-form" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Выберите файл</label>
+                        <input type="file" class="form-control" id="file" name="file" accept=".txt,.mp3,.mp4" required>
+                        <div class="invalid-feedback">Пожалуйста, выберите файл в формате TXT, MP3 или MP4.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="file_type" class="form-label">Тип файла</label>
+                        <select class="form-select" id="file_type" name="file_type" required>
+                            <option value="text">Текстовый файл</option>
+                            <option value="audio">Аудио файл</option>
+                            <option value="video">Видео файл</option>
+                        </select>
+                        <div class="invalid-feedback">Пожалуйста, выберите тип файла.</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100" id="submit-button">
+                        <span id="button-text">Загрузить и обработать</span>
+                        <span id="spinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                    </button>
+                </form>
+                <!-- Уведомление об успешной загрузке -->
+                <div id="success-alert" class="alert alert-success mt-3" style="display: none;">
+                    Файл успешно обработан! <a href="{% url 'file_list' %}" class="alert-link">Посмотреть результат</a>.
+                </div>
+                <!-- Уведомление об ошибке -->
+                <div id="error-alert" class="alert alert-danger mt-3" style="display: none;">
+                    Произошла ошибка при обработке файла. Пожалуйста, попробуйте еще раз.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
