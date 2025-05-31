@@ -1,0 +1,13 @@
+{% extends 'files/base.html' %}
+
+{% block content %}
+{% csrf_token %}
+
+    <h1>Screen Recorder</h1>
+    <button id="startBtn">Start Recording</button>
+    <button id="stopBtn" disabled>Stop Recording</button>
+    <div id="status"></div>
+    <video id="preview" controls style="display:none;"></video>
+    <div id="downloadLink"></div>
+
+{% endblock %}

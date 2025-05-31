@@ -26,6 +26,12 @@ body {
     background-color: rgba(13, 110, 253, 0.1);
 }
 
+.table-hover td {
+    white-space: normal;
+    padding: 8px; /* Добавляет отступы внутри ячейки */
+    vertical-align: top; /* Выравнивает текст по верхнему краю */
+}
+
 /* Анимация при наведении на кнопку */
 .btn-primary:hover {
     transform: translateY(-2px);

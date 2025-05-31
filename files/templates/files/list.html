@@ -23,7 +23,7 @@
                             <td>{{ file.file.name }}</td>
                             <td>{{ file.get_file_type_display }}</td>
                             <td>{{ file.uploaded_at }}</td>
-                            <td>{{ file.summary|default:"Обработка..." }}</td>
+                            <td>{{ file.summary|default:"Обработка..."|linebreaksbr }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>

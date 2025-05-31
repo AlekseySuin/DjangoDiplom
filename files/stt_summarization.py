@@ -1,5 +1,6 @@
 import base64
 import os
+import ffmpeg
 import requests
 import uuid
 import json
@@ -56,12 +57,25 @@ response = requests.request("GET", url, headers=headers, data=payload, verify=Fa
 
 print(response.text)
 
+
+def convert_mp4_to_wav(input_path, output_path):
+    try:
+        ffmpeg.input(input_path).output(output_path, acodec='pcm_s16le').run()
+        return output_path
+    except ffmpeg.Error as e:
+        print(f"Ошибка при преобразовании файла: {e.stderr}")
+        raise
+
 def get_chat_completion(auth_token, user_message):
     url = "https://gigachat.devices.sberbank.ru/api/v1/chat/completions"
 
     payload = json.dumps({
         "model": "GigaChat",  # Используемая модель
         "messages": [
+            {
+                "role": "system",  # Роль отправителя (пользователь)
+                "content": "В вводе пользователя подаётся траскрипция какой-либо встречи. Необходимо определить вид встречи: собеседование или конференция.\nЕсли эта встреча - собеседование: выдели основные темы разговора и ответы опрашиваемого.\n Если эта встреча - конференция: выдели основную цель конференции; выдели основные вопросы и выводы приведённые каждым участником конференции; выведи поставленные участникам конференции замечания при наличии таковых; выведи поставленные участникам конференции задачи при наличии таковых.\n Пример: \nОсновные темы разговора и ответы опрашиваемого:\nЛичные данные: Полное имя (Ксения Выплакова), возраст (22 года) и семейное положение (не замужем). \nПрофессиональный опыт: Работа в колл-центре, предыдущий опыт работы в агентстве недвижимости.\nОжидания по зарплате: Минимальная зарплата — 25 000 рублей, максимальная — 32 500 рублей.\nПричины ухода с предыдущей работы: Чувство дискомфорта в связи с возрастом коллектива.\nНавыки и компетенции: Умение убеждать, оценка своих навыков на уровне 9 из 10.\nГотовность к новой работе: Готовность приступить к обязанностям с понедельника после успешного выполнения тестового задания."  # Содержание сообщения
+            },
             {
                 "role": "user",  # Роль отправителя (пользователь)
                 "content": user_message  # Содержание сообщения
@@ -136,6 +150,6 @@ settings = ConnectionSettings(
 conf = {
     "type": "transcription",
     "transcription_config": {
-        "language": LANGUAGE
-    }
+        "language": LANGUAGE,
+        "diarization": "speaker"    }
 }
