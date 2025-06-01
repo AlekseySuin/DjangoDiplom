@@ -4,7 +4,7 @@ import django
 from pathlib import Path
 
 # Настройка Django
-sys.path.append('/app/backend')
+sys.path.extend(['/app', '/app/backend'])
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backend.config.settings")
 django.setup()
 
