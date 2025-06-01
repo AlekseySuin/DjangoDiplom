@@ -1,0 +1,154 @@
+{% load static %}
+
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech Summary Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Боковое меню -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-microphone-alt"></i>
+                <span>SpeechSummary</span>
+            </div>
+
+            <nav class="menu">
+                <ul>
+                    <li class="active" data-tab="add-task">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Добавить задачу</span>
+                    </li>
+                    <li data-tab="my-tasks">
+                        <i class="fas fa-tasks"></i>
+                        <span>Мои задачи</span>
+                    </li>
+                    <li data-tab="my-files">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Мои файлы</span>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="user-profile">
+                <div class="avatar">
+                    <img src="https://ui-avatars.com/api/?name={{ request.user.username|urlencode }}&background=7c3aed&color=fff" alt="User">
+                </div>
+                <div class="user-info">
+                    <span class="username">{{ request.user.username }}</span>
+                    <span class="user-email">{{ request.user.email }}</span>
+                </div>
+                <a href="{% url 'admin:logout' %}"><i class="fas fa-sign-out-alt"></i></a>
+            </div>
+        </aside>
+
+        <!-- Основное содержимое -->
+        <main class="content">
+            <header class="header">
+                <h1 id="page-title">Добавить задачу</h1>
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Поиск..." id="search-input">
+                </div>
+            </header>
+
+            <div class="tab-content active" id="add-task">
+                <form id="upload-form" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="upload-card">
+                        <div class="upload-area" id="drop-zone">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <h3>Перетащите файлы сюда</h3>
+                            <p>или</p>
+                            <button type="button" class="btn-primary" id="select-file-btn">Выбрать файл</button>
+                            <input type="file" id="file-input" name="file" accept="audio/*,video/*" style="display: none;">
+                        </div>
+                        <div class="file-preview" id="file-preview"></div>
+                    </div>
+
+                    <div class="summary-settings">
+                        <h3>Настройки суммаризации</h3>
+                        <div class="settings-grid">
+                            <div class="setting-item">
+                                <label>Язык</label>
+                                <select name="language">
+                                    <option value="ru">Русский</option>
+                                    <option value="en">Английский</option>
+                                </select>
+                            </div>
+                            <div class="setting-item">
+                                <label>Тип контента</label>
+                                <select name="content_type">
+                                    <option value="interview">Собеседование</option>
+                                    <option value="meeting">Совещание</option>
+                                    <option value="lecture">Лекция</option>
+                                </select>
+                            </div>
+                            <div class="setting-item">
+                                <label>Формат вывода</label>
+                                <select name="output_format">
+                                    <option value="short">Краткий</option>
+                                    <option value="detailed">Подробный</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-primary" id="process-btn">Обработать</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="tab-content" id="my-tasks">
+                <div class="tasks-list">
+                    {% for file in processing_files %}
+                    <div class="task-card">
+                        <div class="task-header">
+                            <span class="task-status processing"></span>
+                            <h3>{{ file.get_file_type_display }}</h3>
+                            <span class="task-date">{{ file.uploaded_at|date:"d.m.Y H:i" }}</span>
+                        </div>
+                        <div class="task-progress">
+                            <div class="progress-bar" style="width: {% if file.summary %}100%{% else %}50%{% endif %}"></div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="no-data">Нет активных задач</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="tab-content" id="my-files">
+                <div class="files-grid">
+                    {% for file in completed_files %}
+                    <div class="file-card">
+                        <div class="file-icon">
+                            <i class="fas fa-file-{% if file.file_type == 'audio' %}audio{% else %}alt{% endif %}"></i>
+                        </div>
+                        <div class="file-info">
+                            <h3>{{ file.file.name|slice:"7:" }}</h3>
+                            <p>{{ file.get_file_type_display }} · {{ file.file.size|filesizeformat }}</p>
+                            <div class="file-actions">
+                                <a href="{{ file.file.url }}" class="btn-icon" download><i class="fas fa-download"></i></a>
+                                <button class="btn-icon delete-file" data-file-id="{{ file.id }}"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                        {% if file.summary %}
+                        <div class="file-summary">
+                            <p>{{ file.summary|truncatechars:100 }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% empty %}
+                    <p class="no-data">Нет сохраненных файлов</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="{% static 'js/script.js' %}"></script>
+</body>
+</html>

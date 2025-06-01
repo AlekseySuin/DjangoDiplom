@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  web:
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONPATH=/app/backend
+      - DJANGO_SETTINGS_MODULE=config.settings
+    volumes:
+      - .:/app
+      - static_volume:/app/uploads/static
+
+  bot:
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: Dockerfile.bot
+    environment:
+      - PYTHONPATH=/app:/app/backend
+      - DJANGO_SETTINGS_MODULE=config.settings
+    volumes:
+      - .:/app
+
+
+volumes:
+  static_volume:
