@@ -16,4 +16,4 @@ ENV PYTHONPATH=/app/backend
 ENV DJANGO_SETTINGS_MODULE=config.settings
 
 # Команда для запуска
-CMD ["sh", "-c", "python bot/bot.py & gunicorn --bind 0.0.0.0:8000 backend.wsgi"]
+CMD ["sh", "-c", "python bot/bot.py & gunicorn --bind 0.0.0.0:8000 config.wsgi"]

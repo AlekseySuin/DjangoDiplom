@@ -38,10 +38,10 @@ def upload_file(request):
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             file = form.save(commit=False)
-            file.user = request.user
             file.save()
 
             try:
+                print(file.file.path)
                 transcript = transcribe_audio(file.file.path)
                 summary = summarize_text(transcript)
                 file.summary = summary
@@ -73,6 +73,15 @@ def upload_file(request):
 
 @csrf_exempt
 def delete_file(request, file_id):
-    file = get_object_or_404(UploadedFile, id=file_id, user=request.user)
-    file.delete()
-    return JsonResponse({'status': 'success'})
+    try:
+        file = UploadedFile.objects.get(id=file_id)
+        file_path = file.file.path
+        if os.path.exists(file_path):
+            os.remove(file_path)
+        file.delete()
+        return JsonResponse({'status': 'success'})
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=500)
