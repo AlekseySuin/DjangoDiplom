@@ -7,6 +7,15 @@ class UploadFileForm(forms.ModelForm):
         model = UploadedFile
         fields = ['file', 'file_type']
         widgets = {
-            'file': forms.FileInput(attrs={'accept': 'audio/*,video/*'}),
-            'file_type': forms.Select(choices=UploadedFile.file_type)
+            'file_type': forms.Select(choices=[
+                ('audio', 'Аудио'),
+                ('video', 'Видео'),
+                ('text', 'Текст')
+            ])
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['file_type'].required = True
+        self.fields['file_type'].label = 'Тип файла'
+        self.fields['file'].label = 'Файл'

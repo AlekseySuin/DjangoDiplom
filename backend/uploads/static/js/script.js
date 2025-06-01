@@ -1,7 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // CSRF Token для AJAX
-    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-
     // Переключение между вкладками
     const menuItems = document.querySelectorAll('.menu li');
     const tabContents = document.querySelectorAll('.tab-content');
@@ -9,12 +6,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     menuItems.forEach(item => {
         item.addEventListener('click', function() {
+            // Удаляем активный класс у всех элементов
             menuItems.forEach(i => i.classList.remove('active'));
             tabContents.forEach(c => c.classList.remove('active'));
 
+            // Добавляем активный класс к выбранному элементу
             this.classList.add('active');
             const tabId = this.getAttribute('data-tab');
             document.getElementById(tabId).classList.add('active');
+
+            // Обновляем заголовок страницы
             pageTitle.textContent = this.querySelector('span').textContent;
         });
     });
@@ -23,10 +24,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('file-input');
     const filePreview = document.getElementById('file-preview');
-    const selectFileBtn = document.getElementById('select-file-btn');
-    const uploadForm = document.getElementById('upload-form');
+    const processBtn = document.getElementById('process-btn');
 
-    // Обработчики drag and drop
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
         dropZone.addEventListener(eventName, preventDefaults, false);
     });
@@ -53,7 +52,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     dropZone.addEventListener('drop', handleDrop, false);
-    selectFileBtn.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('click', () => fileInput.click());
+
     fileInput.addEventListener('change', handleFiles);
 
     function handleDrop(e) {
@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function displayFilePreview(file) {
         filePreview.innerHTML = `
             <div class="file-preview-item">
-                <i class="fas fa-file-${file.type.includes('audio') ? 'audio' : 'alt'}"></i>
+                <i class="fas fa-file-alt"></i>
                 <div>
                     <h4>${file.name}</h4>
                     <p>${formatFileSize(file.size)}</p>
@@ -90,75 +90,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Отправка формы
-    uploadForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        const formData = new FormData(this);
-        const processBtn = document.getElementById('process-btn');
-
-        processBtn.disabled = true;
-        processBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Обработка...';
-
-        fetch(this.action, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRFToken': csrftoken
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                alert('Файл успешно обработан!');
-                window.location.reload();
-            } else {
-                throw new Error(data.message || 'Ошибка обработки файла');
-            }
-        })
-        .catch(error => {
-            alert(error.message);
-        })
-        .finally(() => {
-            processBtn.disabled = false;
-            processBtn.textContent = 'Обработать';
-        });
-    });
-
-    // Удаление файлов
-    document.querySelectorAll('.delete-file').forEach(btn => {
-        btn.addEventListener('click', function() {
-            if (confirm('Вы уверены, что хотите удалить этот файл?')) {
-                const fileId = this.getAttribute('data-file-id');
-
-                fetch(`/delete-file/${fileId}/`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': csrftoken,
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        this.closest('.file-card').remove();
-                    }
-                });
-            }
-        });
-    });
-
-    // Поиск по файлам
-    const searchInput = document.getElementById('search-input');
-    searchInput.addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase();
-        document.querySelectorAll('.file-card').forEach(card => {
-            const text = card.textContent.toLowerCase();
-            card.style.display = text.includes(searchTerm) ? '' : 'none';
-        });
-    });
-
-    // Вспомогательная функция
     function formatFileSize(bytes) {
         if (bytes === 0) return '0 Bytes';
         const k = 1024;
@@ -166,4 +97,20 @@ document.addEventListener('DOMContentLoaded', function() {
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
     }
+
+    // Обработка файла
+    processBtn.addEventListener('click', function() {
+        if (!fileInput.files.length) {
+            alert('Пожалуйста, выберите файл');
+            return;
+        }
+
+        // Здесь будет вызов API для обработки файла
+        alert('Файл отправлен на обработку');
+
+        // Имитация обработки (для демонстрации)
+        setTimeout(() => {
+            alert('Обработка завершена! Результат доступен во вкладке "Мои файлы"');
+        }, 3000);
+    });
 });

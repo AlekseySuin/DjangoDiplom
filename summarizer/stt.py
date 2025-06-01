@@ -40,5 +40,5 @@ def transcribe_audio(file_path):
                 print(e.response.json()['detail'])
             else:
                 raise e
-
+        print(transcript)
         return transcript
