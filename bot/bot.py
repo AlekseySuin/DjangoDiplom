@@ -1,11 +1,11 @@
 import os
 import sys
+import django
 from pathlib import Path
 
 # Настройка Django
-sys.path.append('/app')
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backend.settings")
-import django
+sys.path.append('/app/backend')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backend.config.settings")
 django.setup()
 
 # Теперь можно импортировать всё из Django

@@ -1,25 +1,17 @@
-# Базовый образ
 FROM python:3.10-slim
 
-# Рабочая директория
 WORKDIR /app
 
-# Копирование зависимостей
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Копирование кода
 COPY . .
 
-# Установка переменных окружения
-ENV PYTHONPATH=/app
-ENV DJANGO_SETTINGS_MODULE=config.settings
+# Ключевые изменения:
+ENV PYTHONPATH=/app/backend
+ENV DJANGO_SETTINGS_MODULE=backend.config.settings
 
-# Проверка структуры (можно удалить после отладки)
-RUN echo "Проверка структуры проекта:" && \
-    ls -la /app && \
-    ls -la /app/backend && \
-    ls -la /app/bot
+# Для отладки (можно удалить после)
+RUN echo "Содержимое /app/backend:" && ls -la /app/backend
 
-# Команда для запуска
-CMD ["sh", "-c", "python bot/bot.py & gunicorn --bind 0.0.0.0:8000 config.wsgi:application"]
+CMD ["sh", "-c", "python bot/bot.py & gunicorn --bind 0.0.0.0:8000 backend.config.wsgi:application"]
