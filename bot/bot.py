@@ -1,6 +1,7 @@
 import os
 import sys
 import django
+import fcntl
 from pathlib import Path
 
 # Настройка Django
@@ -19,8 +20,32 @@ def run_bot():
     application.add_handler(CommandHandler("start", start))
     application.add_handler(MessageHandler(filters.VOICE | filters.AUDIO, handle_audio))
     print("🤖 Telegram-бот запущен...")
-    application.run_polling()
+    application.run_polling(
+        drop_pending_updates=True,
+        close_loop=False,
+        stop_signals=None,
+        allowed_updates=None
+    )
 
+def check_single_instance():
+    lock_file = '/tmp/bot.lock'
+    fd = os.open(lock_file, os.O_CREAT | os.O_RDWR)
+    try:
+        fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        return fd
+    except BlockingIOError:
+        print("❌ Другой экземпляр бота уже запущен!")
+        os.close(fd)
+        exit(1)
 
 if __name__ == "__main__":
-    run_bot()
+    lock_fd = check_single_instance()
+    try:
+        run_bot()
+    finally:
+        fcntl.flock(lock_fd, fcntl.LOCK_UN)
+        os.close(lock_fd)
+        try:
+            os.unlink('/tmp/bot.lock')
+        except:
+            pass
