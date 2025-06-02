@@ -14,6 +14,10 @@ ALLOWED_HOSTS = ['*']
 # Telegram Bot
 TELEGRAM_BOT_TOKEN = env('TELEGRAM_BOT_TOKEN')
 
+# Telegram Bot Settings
+TELEGRAM_BOT_POLLING_TIMEOUT = 30  # секунд
+TELEGRAM_BOT_MAX_RETRIES = 3       # попытки переподключения
+
 # Speechmatics
 SPEECHMATICS_API_KEY = "8eKbSukN5097FtrYF4fdQheDRkjE6uG9"
 
