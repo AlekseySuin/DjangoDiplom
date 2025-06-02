@@ -15,4 +15,4 @@ RUN echo "Проверка структуры:" && \
     ls -la backend && \
     ls -la backend/config
 
-CMD ["sh", "-c", "python bot/bot.py & gunicorn --bind 0.0.0.0:8000 backend.config.wsgi:application"]
+CMD ["sh", "-c", "if [ -f /app/bot.pid ]; then kill -9 $(cat /app/bot.pid) || true; fi && echo $$ > /app/bot.pid && python bot/bot.py"]
