@@ -12,7 +12,7 @@ API_KEY = settings.SPEECHMATICS_API_KEY
 LANGUAGE = "ru"
 
 settings = ConnectionSettings(
-    url="https://eu.asr.api.speechmatics.com/v2",
+    url="https://asr.api.speechmatics.com/v2",
     auth_token=API_KEY,
 )
 
